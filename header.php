@@ -40,7 +40,7 @@ body::after{ width:90px; height:90px; animation-duration: 22s; animation-directi
 .wrap{max-width:1100px;margin:0 auto;padding:16px; position:relative; z-index:1}
 header.app{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
 .brand{display:flex;align-items:center;gap:10px}
-.logo{width:44px;height:44px;border-radius:12px;background:conic-gradient(from 0deg, var(--neon), var(--aqua), var(--lime), var(--neon)); box-shadow:0 0 24px rgba(139,61,255,.6)}
+.logo{width:44px;height:44px;border-radius:12px;}
 h1{margin:0;font-size:1.15rem;letter-spacing:.3px}
 .nav a{color:#d0c6ff;text-decoration:none;margin-left:10px}
 .badge{font-size:.72rem;color:#04140e;background:var(--lime);padding:3px 7px;border-radius:999px;font-weight:800}
@@ -90,12 +90,12 @@ hr.sep{border:0;border-top:1px solid var(--line);margin:10px 0}
 <body>
 <div class="wrap">
   <header class="app">
-    <div class="brand">
-      <div class="logo"></div>
+     <div class="brand">
+      <img class="logo" src="dalialogo.png" alt="Dink It With Dalia Logo"/>
       <div>
         <h1>Dink It With Dalia <span class="badge">Pickleball</span></h1>
-        <div class="mini">Sporty neon purple + green • Mobile-first</div>
+        <div class="mini">Your court is ready!</div>
       </div>
     </div>
-    <nav class="nav"><a href="index.php">Booking</a> • <a href="admin.php">Admin</a></nav>
+    <nav class="nav"><a class="btnnav" href="index.php"> Booking</a><a class="btnnav outline" href="admin.php"> Admin</a></nav>
   </header>

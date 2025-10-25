@@ -1,4 +1,212 @@
 <?php require_once __DIR__ . '/header.php'; ?>
+<style>
+  /* Booking Modal Styles */
+.booking-modal-container .swal2-popup {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.booking-popup {
+  padding: 0;
+}
+
+.booking-header {
+  padding: 20px 24px 0;
+}
+
+.booking-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.booking-html-container {
+  padding: 0;
+  margin: 0;
+}
+
+/* Court Header */
+.court-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px 24px;
+  margin-bottom: 0;
+}
+
+.court-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.court-title h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.court-code {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.time-slot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.time-icon {
+  font-size: 0.8rem;
+}
+
+/* Booking Form */
+.booking-form {
+  padding: 24px;
+}
+
+.form-section {
+  margin-bottom: 24px;
+}
+
+.form-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.form-row:last-child {
+  margin-bottom: 0;
+}
+
+.dual-inputs {
+  gap: 16px;
+}
+
+.dual-inputs .form-group {
+  flex: 1;
+}
+
+.form-group {
+  flex: 1;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.label-icon {
+  font-size: 0.8rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.helper-text {
+  display: block;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+/* Buttons */
+.booking-confirm-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.booking-confirm-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.booking-cancel-btn {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px 24px;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.booking-cancel-btn:hover {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+/* Responsive */
+@media (max-width: 520px) {
+  .form-row.dual-inputs {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .swal2-container {
+    padding: 0 12px;
+  }
+}
+  </style>
 <section class="grid grid-2">
   <div class="card">
     <h3>Find Available</h3>
@@ -66,16 +274,80 @@ function openBooking(slot){
     title: 'Book this slot',
     backdrop: `rgba(0,0,0,.45)`,
     html: `
-      <div style="text-align:left">
-        <div class="mini" style="margin-bottom:6px"><strong>${slot.court_name} ${slot.court_code?`<span class='mini'>#${slot.court_code}</span>`:''}</strong> • ${new Date(slot.start_time).toLocaleString()} – ${new Date(slot.end_time).toLocaleString()}</div>
-        <label>Name</label><input id="bf_name" class="swal2-input" placeholder="Your name">
-        <label>Contact (mobile for SMS)</label><input id="bf_contact" class="swal2-input" placeholder="09xx...">
-        <div style="display:flex;gap:8px">
-          <input type="number" id="bf_players" class="swal2-input" min="1" value="2" placeholder="Players">
-      
+    
+      <div class="booking-modal">
+        <!-- Court Info Header -->
+        <div class="court-header">
+          <div class="court-title">
+            <h3>${slot.court_name}</h3>
+            ${slot.court_code ? `<span class="court-code">#${slot.court_code}</span>` : ''}
+          </div>
+          <div class="time-slot">
+            <i class="time-icon">⏱</i>
+            <span>${new Date(slot.start_time).toLocaleString()} – ${new Date(slot.end_time).toLocaleString()}</span>
+          </div>
         </div>
-        <label>Players (names & numbers)</label>
-        <textarea id="bf_list" class="swal2-textarea" placeholder="1) Name — #\n2) Name — #"></textarea>
+
+        <!-- Booking Form -->
+        <div class="booking-form">
+          <!-- Personal Information -->
+          <div class="form-section">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="bf_name" class="form-label">
+                  <i class="label-icon">👤</i>
+                  Full Name
+                </label>
+                <input type="text" id="bf_name" class="form-input" placeholder="Enter your full name">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="bf_contact" class="form-label">
+                  <i class="label-icon">📱</i>
+                  Mobile Number
+                </label>
+                <input type="tel" id="bf_contact" class="form-input" placeholder="09xx-xxx-xxxx">
+                <small class="helper-text">For SMS confirmation</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Session Details -->
+          <div class="form-section">
+            <h4 class="section-title">Session Details</h4>
+            <div class="form-row dual-inputs">
+              <div class="form-group">
+                <label for="bf_players" class="form-label">
+                  <i class="label-icon">👥</i>
+                  Number of Players
+                </label>
+                <input type="number" id="bf_players" class="form-input" min="1" max="10" value="2">
+              </div>
+              <div class="form-group">
+                <label for="bf_duration" class="form-label">
+                  <i class="label-icon">⏰</i>
+                  Duration (Hours)
+                </label>
+                <input type="number" id="bf_duration" class="form-input" min="0.5" max="4" step="0.5" value="1">
+              </div>
+            </div>
+          </div>
+
+          <!-- Players List -->
+          <div class="form-section">
+            <div class="form-group">
+              <label for="bf_list" class="form-label">
+                <i class="label-icon">📝</i>
+                Players Information
+              </label>
+              <textarea id="bf_list" class="form-textarea" rows="4" 
+                        placeholder="Enter player details (one per line):&#10;1) Player Name &#10;2) Player Name "></textarea>
+              <small class="helper-text">Format: Name — (one per line)</small>
+            </div>
+          </div>
+        </div>
       </div>
     `,
     showCancelButton:true,

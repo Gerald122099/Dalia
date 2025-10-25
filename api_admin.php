@@ -88,21 +88,43 @@ if ($action==='api_admin_bookings'){
   if($status && $status!=='all'){ $sql.=' WHERE b.status=?'; $p[]=$status; }
   $sql.=' ORDER BY b.created_at DESC LIMIT 500'; $st=db()->prepare($sql); $st->execute($p); json_ok($st->fetchAll());
 }
-
 if ($action==='api_admin_confirm_booking'){
   $bid=(int)postv('booking_id'); $pdo=db(); $pdo->beginTransaction();
-  $b=$pdo->prepare('SELECT b.*, c.court_code FROM bookings b JOIN courts c ON c.id=b.court_id WHERE b.id=? FOR UPDATE'); $b->execute([$bid]); $bk=$b->fetch();
+  $b=$pdo->prepare('SELECT b.*, c.court_code FROM bookings b JOIN courts c ON c.id=b.court_id WHERE b.id=? FOR UPDATE'); 
+  $b->execute([$bid]); 
+  $bk=$b->fetch();
+
   if(!$bk){ $pdo->rollBack(); json_err('Booking not found',404); }
   if($bk['status']!=='pending'){ $pdo->rollBack(); json_err('Not pending',409); }
+
   $pdo->prepare('UPDATE bookings SET status="confirmed", updated_at=NOW(), confirmed_at=NOW() WHERE id=?')->execute([$bid]);
   $pdo->prepare('UPDATE slots SET status="confirmed" WHERE id=?')->execute([$bk['slot_id']]);
   $pdo->commit();
+
   if (!empty($bk['contact']) && preg_match('/^[0-9+][0-9\s\-()]*$/', $bk['contact'])){
-    $msg = "BOOKING CONFIRMED\nCourt: {$bk['court_id']} (#{$bk['court_code']})\nTime: {$bk['start_time']}\nRef: #{$bk['id']}";
+
+    // ----- Fancy date & time formatting -----
+    $st = new DateTime($bk['start_time']);
+    $en = new DateTime($bk['end_time']);
+
+    $dateTxt  = $st->format('F j, Y (l)');        // e.g., October 8, 2025 (Sunday)
+    $startTxt = strtoupper($st->format('g:ia'));  // e.g., 4:00PM
+    $endTxt   = strtoupper($en->format('g:ia'));  // e.g., 5:00PM
+
+    // Remove ":00" when on-the-hour -> 4PM-5PM
+    $startTxt = preg_replace('/:00(?=AM|PM)/', '', $startTxt);
+    $endTxt   = preg_replace('/:00(?=AM|PM)/',   '', $endTxt);
+
+    $timeTxt  = $startTxt . '-' . $endTxt;
+
+    $msg = "BOOKING CONFIRMED\nDate: {$dateTxt}\nTime: {$timeTxt}\nCourt: {$bk['court_id']} (#{$bk['court_code']})\nRef: #{$bk['id']}";
+
     send_sms($bk['contact'], $msg);
   }
+
   json_ok();
 }
+
 
 if ($action==='api_admin_cancel_booking'){
   $bid=(int)postv('booking_id'); $pdo=db(); $pdo->beginTransaction();
